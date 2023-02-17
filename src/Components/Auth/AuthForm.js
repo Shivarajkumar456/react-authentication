@@ -1,28 +1,69 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 import classes from './AuthForm.module.css';
 
 const AuthForm = () => {
+  const emailRef = useRef();
+  const passwordRef = useRef();
   const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setisLoading] = useState(false);
 
   const switchAuthModeHandler = () => {
     setIsLogin((prevState) => !prevState);
   };
 
+  const submitHandler = (event) => {
+    event.preventDefault();
+    const enteredEmail = emailRef.current.value;
+    const enteredPassword = passwordRef.current.value;
+    setisLoading(true);
+
+    if(isLogin){
+
+    }else {
+      fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyDIbTuKFiP0KlJ3U9fC_BAI6640qbdwa_g',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          email: enteredEmail,
+          password: enteredPassword,
+          returnSecureToken: true
+        }),
+        headers:{
+          'Content-type': 'application/json'
+        }
+      }).then((res)=>{
+        setisLoading(false)
+        if(res.ok){
+
+        }else{
+          return res.json().then(data=>{
+            let errorMessage = 'Authentication Failed!';
+            if(data && data.error && data.error.message){
+              errorMessage = data.error.message
+            }
+            alert(errorMessage)
+          })
+        }
+      })
+    }
+  }
+
   return (
     <section className={classes.auth}>
       <h1>{isLogin ? 'Login' : 'Sign Up'}</h1>
-      <form>
+      <form onSubmit={submitHandler}>
         <div className={classes.control}>
           <label htmlFor='email'>Your Email</label>
-          <input type='email' id='email' required />
+          <input type='email' id='email' required ref={emailRef}/>
         </div>
         <div className={classes.control}>
           <label htmlFor='password'>Your Password</label>
-          <input type='password' id='password' required />
+          <input type='password' id='password' required ref={passwordRef}/>
         </div>
         <div className={classes.actions}>
-          <button>{isLogin ? 'Login' : 'Create Account'}</button>
+          {!isLoading && <button>{isLogin ? 'Login' : 'Create Account'}</button>}
+          {isLoading && <p>Sending Request...</p>}
           <button
             type='button'
             className={classes.toggle}
