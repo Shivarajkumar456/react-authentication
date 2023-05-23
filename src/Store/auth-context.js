@@ -16,7 +16,7 @@ export const AuthContextProvider = (props) => {
   const loginHandler = (token) => {
     setToken(token);
     localStorage.setItem('token', token);
-    setTimeout(logoutHandler, 5*60*1000);
+    // setTimeout(logoutHandler, 5*60*1000);
   };
 
   const logoutHandler = () => {
@@ -34,9 +34,11 @@ export const AuthContextProvider = (props) => {
     };
     let logoutTimer;
     window.addEventListener('mousedown', resetTimer);
+    window.addEventListener('mousemove', resetTimer);
     window.addEventListener('keydown', resetTimer);
     return () => {
       window.removeEventListener('mousedown', resetTimer);
+      window.addEventListener('mousemove', resetTimer);
       window.removeEventListener('keydown', resetTimer);
     };
   }, [userIsLoggedIn]);
